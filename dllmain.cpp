@@ -110,7 +110,7 @@ void __fastcall pkodev::hook::ToClient__CM_LOGIN(void* This, void* NotUsed,
 
     // Get RPacket::m_revrpos pointer
     unsigned int * const m_revrpos = reinterpret_cast<unsigned int*>(
-        reinterpret_cast<unsigned int>(This) + 0x38
+        reinterpret_cast<unsigned int>(recvbuf) + 0x38
     );
 
     // Set read position + 4
@@ -132,9 +132,6 @@ void __fastcall pkodev::hook::ToClient__CM_LOGIN(void* This, void* NotUsed,
     // Write the IP address to datasocket
     strncpy_s(reinterpret_cast<char *>(datasock) + 0xB4, 16, ip_address, _TRUNCATE);
 
-    // Debug
-    std::cout << "ip: " << ip_address << std::endl;
-
     // Call the original method void ToClient::CM_LOGIN(DataSocket* datasock, RPacket& recvbuf)
     pkodev::pointer::ToClient__CM_LOGIN(This, datasock, recvbuf);
 }
@@ -142,10 +139,10 @@ void __fastcall pkodev::hook::ToClient__CM_LOGIN(void* This, void* NotUsed,
 // Patch GateServer.exe
 void patch(unsigned int address, const char* bytes, unsigned int length, char* backup)
 {
-    // Access type
+    // Memory access type
     DWORD access = PAGE_EXECUTE_READWRITE;
 
-    // Change the access protection of the proccess
+    // Change the memory protection of the proccess
     VirtualProtect(reinterpret_cast<LPVOID>(address), length, access, &access);
 
     // Save backup bytes
